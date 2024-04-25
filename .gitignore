@@ -49,3 +49,10 @@ package.json
 /man/
 /share/
 /src/
+
+
+# project
+venv
+.history
+tutorials/*
+!tutorials/estate/
