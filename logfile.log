@@ -1,0 +1,66 @@
+
+2024-04-26 10:59:04,658 5756 INFO ? odoo: Odoo version 17.0 
+2024-04-26 10:59:04,659 5756 INFO ? odoo: Using configuration file at D:\workspace\odoo\conf\odoo.conf 
+2024-04-26 10:59:04,660 5756 INFO ? odoo: addons paths: ['D:\\workspace\\odoo\\odoo\\addons', 'c:\\users\\lcfzh\\appdata\\local\\openerp s.a\\odoo\\addons\\17.0', 'd:\\workspace\\odoo\\tutorials', 'd:\\workspace\\odoo\\odoo\\addons'] 
+2024-04-26 10:59:04,660 5756 INFO ? odoo: database: odoo@127.0.0.1:5432 
+2024-04-26 10:59:05,017 5756 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at D:\Scoop\shims\wkhtmltopdf.exe 
+2024-04-26 10:59:05,365 5756 INFO ? odoo.service.server: HTTP service (werkzeug) running on DESKTOP-RRPISM1:8069 
+2024-04-26 10:59:05,437 5756 INFO odoo odoo.modules.loading: loading 1 modules... 
+2024-04-26 10:59:05,442 5756 INFO odoo odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2024-04-26 10:59:05,460 5756 INFO odoo odoo.modules.loading: updating modules list 
+2024-04-26 10:59:05,462 5756 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2024-04-26 10:59:05,558 5756 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['estate'] to user __system__ #1 via n/a 
+2024-04-26 10:59:05,558 5756 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['estate'] to user __system__ #1 via n/a 
+2024-04-26 10:59:05,607 5756 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2024-04-26 10:59:05,619 5756 INFO odoo odoo.modules.loading: loading 12 modules... 
+2024-04-26 10:59:05,619 5756 INFO odoo odoo.modules.loading: Loading module estate (2/12) 
+2024-04-26 10:59:05,653 5756 WARNING odoo odoo.modules.loading: Transient module states were reset 
+2024-04-26 10:59:05,653 5756 ERROR odoo odoo.modules.registry: Failed to load registry 
+Traceback (most recent call last):
+  File "D:\workspace\odoo\odoo\modules\registry.py", line 113, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 476, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 364, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 204, in load_module_graph
+    registry.setup_models(env.cr)
+  File "<decorator-gen-19>", line 2, in setup_models
+  File "D:\workspace\odoo\odoo\tools\func.py", line 87, in locked
+    return func(inst, *args, **kwargs)
+  File "D:\workspace\odoo\odoo\modules\registry.py", line 323, in setup_models
+    model._setup_fields()
+  File "D:\workspace\odoo\odoo\models.py", line 3376, in _setup_fields
+    field.setup(self)
+  File "D:\workspace\odoo\odoo\fields.py", line 533, in setup
+    self.setup_nonrelated(model)
+  File "D:\workspace\odoo\odoo\fields.py", line 4401, in setup_nonrelated
+    invf = comodel._fields[self.inverse_name]
+KeyError: 'property_type_id'
+2024-04-26 10:59:05,660 5756 CRITICAL odoo odoo.service.server: Failed to initialize database `odoo`. 
+Traceback (most recent call last):
+  File "D:\workspace\odoo\odoo\service\server.py", line 1302, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "<decorator-gen-16>", line 2, in new
+  File "D:\workspace\odoo\odoo\tools\func.py", line 87, in locked
+    return func(inst, *args, **kwargs)
+  File "D:\workspace\odoo\odoo\modules\registry.py", line 113, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 476, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 364, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "D:\workspace\odoo\odoo\modules\loading.py", line 204, in load_module_graph
+    registry.setup_models(env.cr)
+  File "<decorator-gen-19>", line 2, in setup_models
+  File "D:\workspace\odoo\odoo\tools\func.py", line 87, in locked
+    return func(inst, *args, **kwargs)
+  File "D:\workspace\odoo\odoo\modules\registry.py", line 323, in setup_models
+    model._setup_fields()
+  File "D:\workspace\odoo\odoo\models.py", line 3376, in _setup_fields
+    field.setup(self)
+  File "D:\workspace\odoo\odoo\fields.py", line 533, in setup
+    self.setup_nonrelated(model)
+  File "D:\workspace\odoo\odoo\fields.py", line 4401, in setup_nonrelated
+    invf = comodel._fields[self.inverse_name]
+KeyError: 'property_type_id'

@@ -10,19 +10,20 @@ class EstateProperty(models.Model):
     create_date = fields.Datetime("Created Date", readonly=True)
     write_uid = fields.Many2one("res.users", "Last Updated by", readonly=True)
     write_date = fields.Datetime("Last Updated", readonly=True)
-    name = fields.Char("Name", required=True)
-    description = fields.Text("Description")
-    postcode = fields.Char("Postcode")
-    date_availability = fields.Date("Availability Date")
-    expected_price = fields.Float("Expected Price", digits=(14, 2))
-    selling_price = fields.Float("Selling Price", digits=(14, 2))
-    bedrooms = fields.Integer("Bedrooms", required=True)
-    living_area = fields.Integer("Lving Area (m2)")
-    facades = fields.Integer("Number of Facades")
-    garage = fields.Boolean("Garage")
-    garden = fields.Boolean("Garden")
-    garden_area = fields.Integer("Garden Area (m2)")
-    garden_orientation = fields.Char("Garden Orientation")
+    name = fields.Char("Name", required=True, default="Unknown")  # 名称
+    last_seen = fields.Datetime("Last Seen", default=fields.Datetime.now())
+    description = fields.Text("Description")  # 描述
+    postcode = fields.Char("Postcode邮政编码")  # 邮政编码
+    date_availability = fields.Date("Availability Date")  # 可用日期
+    expected_price = fields.Float("Expected Price", digits=(14, 2))  # 期望价格
+    selling_price = fields.Float("Selling Price", digits=(14, 2))  # 销售价格
+    bedrooms = fields.Integer("Bedrooms", required=True)  # 卧室数
+    living_area = fields.Integer("Lving Area (m2)")  # 生活区域
+    facades = fields.Integer("Number of Facades")  # 门面
+    garage = fields.Boolean("Garage")  # 车库
+    garden = fields.Boolean("Garden")  # 花园
+    garden_area = fields.Integer("Garden Area (m2)")  # 花园面积
+    garden_orientation = fields.Char("Garden Orientation")  # 花园方向
 
     _sql_constraints = [
         # 定义一个外键约束，create_uid引用res.users表的id
