@@ -56,3 +56,4 @@ venv
 .history
 tutorials/*
 !tutorials/estate/
+logfile.log

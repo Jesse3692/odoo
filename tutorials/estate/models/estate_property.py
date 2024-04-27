@@ -24,6 +24,7 @@ class EstateProperty(models.Model):
     garden = fields.Boolean("Garden")  # 花园
     garden_area = fields.Integer("Garden Area (m2)")  # 花园面积
     garden_orientation = fields.Char("Garden Orientation")  # 花园方向
+    property_type_id = fields.Many2one("estate.property.type", string="Property type")
 
     _sql_constraints = [
         # 定义一个外键约束，create_uid引用res.users表的id
