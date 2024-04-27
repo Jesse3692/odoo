@@ -7,4 +7,47 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <record id="estate_property_type_view_tree" model="ir.ui.view">
+        <field name="name">estate.property.type.tree</field>
+        <field name="model">estate.property.type</field>
+        <field name="arch" type="xml">
+            <tree string="Types">
+                <field name="sequence" widget="handle"></field>
+                <field name="name"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_property_type_view_form" model="ir.ui.view">
+        <field name="name">estate.property.type.form</field>
+        <field name="model">estate.property.type</field>
+        <field name="arch" type="xml">
+            <form string="Estate property Type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(estate_property_offer_action)d" type="action"
+                            class="oe_stat_button" icon="fa-bars"
+                            attrs="{'invisible':[('offer_count','=',0)]}">
+                            <field name="offer_count"></field>
+                            <span attrs="{'invisible':[('offer_count','&gt;',1)]}">Offer</span>
+                            <span attrs="{'invisible':[('offer_count','&lt;',1)]}">Offers</span>
+                        </button>
+                    </div>
+                    <field name="name" class="h2"></field>
+                    <notebook>
+                        <page string="Properties">
+                            <filed name="property_ids">
+                                <tree>
+                                    <field name="name" string="Title"></field>
+                                    <field name="expected_price" string="Expected Price"></field>
+                                    <field name="status" string="Status"></field>
+                                </tree>
+                            </filed>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
 </odoo>
