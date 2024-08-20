@@ -1,6 +1,5 @@
 import datetime
 import string
-import zeep
 import re
 import stdnum
 from stdnum.eu.vat import check_vies
@@ -11,6 +10,7 @@ from stdnum import luhn
 import logging
 
 from odoo import api, models, fields, tools, _
+from odoo.tools import zeep
 from odoo.tools.misc import ustr
 from odoo.exceptions import ValidationError
 
@@ -31,12 +31,13 @@ _ref_vat = {
     'be': 'BE0477472701',
     'bg': 'BG1234567892',
     'br': _('either 11 digits for CPF or 14 digits for CNPJ'),
+    'cr': _('3101012009'),
     'ch': _('CHE-123.456.788 TVA or CHE-123.456.788 MWST or CHE-123.456.788 IVA'),  # Swiss by Yannick Vaucher @ Camptocamp
     'cl': 'CL76086428-5',
     'co': _('CO213123432-1 or CO213.123.432-1'),
     'cy': 'CY10259033P',
     'cz': 'CZ12345679',
-    'de': 'DE123456788',
+    'de': _('DE123456788 or 12/345/67890'),
     'dk': 'DK12345674',
     'do': _('DO1-01-85004-3 or 101850043'),
     'ec': _('1792060346001 or 1792060346'),
@@ -49,6 +50,7 @@ _ref_vat = {
     'hu': _('HU12345676 or 12345678-1-11 or 8071592153'),
     'hr': 'HR01234567896',  # Croatia, contributed by Milan Tribuson
     'ie': 'IE1234567FA',
+    'il': _('XXXXXXXXX [9 digits] and it should respect the Luhn algorithm checksum'),
     'in': "12AAAAA1234AAZA",
     'is': 'IS062199',
     'it': 'IT12345670017',
@@ -73,6 +75,7 @@ _ref_vat = {
     'sk': 'SK2022749619',
     'sm': 'SM24165',
     'tr': _('TR1234567890 (VERGINO) or TR17291716060 (TCKIMLIKNO)'),  # Levent Karakas @ Eska Yazilim A.S.
+    'uy': _("'219999830019' (should be 12 digits)"),
     've': 'V-12345678-1, V123456781, V-12.345.678-1',
     'xi': 'XI123456782',
     'sa': _('310175397400003 [Fifteen digits, first and last digits should be "3"]')
@@ -200,6 +203,7 @@ class ResPartner(models.Model):
                 partner.vies_valid = False
                 continue
             try:
+                _logger.info('Calling VIES service to check VAT for validation: %s', partner.vies_vat_to_check)
                 vies_valid = check_vies(partner.vies_vat_to_check, timeout=10)
                 partner.vies_valid = vies_valid['valid']
             except (OSError, InvalidComponent, zeep.exceptions.Fault) as e:
@@ -750,6 +754,16 @@ class ResPartner(models.Model):
         is_cnpj_valid = stdnum.get_cc_module('br', 'cnpj').is_valid
         return is_cpf_valid(vat) or is_cnpj_valid(vat)
 
+    __check_vat_cr_re = re.compile(r'^(?:[1-9]\d{8}|\d{10}|[1-9]\d{10,11})$')
+
+    def check_vat_cr(self, vat):
+        # CÉDULA FÍSICA: 9 digits
+        # CÉDULA JURÍDICA: 10 digits
+        # CÉDULA DIMEX: 11 or 12 digits
+        # CÉDULA NITE: 10 digits
+
+        return self.__check_vat_cr_re.match(vat) or False
+
     def format_vat_eu(self, vat):
         # Foreign companies that trade with non-enterprises in the EU
         # may have a VATIN starting with "EU" instead of a country code.
@@ -769,11 +783,20 @@ class ResPartner(models.Model):
 
         # VAT is only digits and of the right length, check the Luhn checksum.
         try:
-            luhn.validate(vat[0:9])
+            luhn.validate(vat[0:9] if len(vat) == 15 else vat[1:10])
         except (InvalidFormat, InvalidChecksum):
             return False
 
         return True
+
+    def check_vat_de(self, vat):
+        is_valid_vat = stdnum.util.get_cc_module("de", "vat").is_valid
+        is_valid_stnr = stdnum.util.get_cc_module("de", "stnr").is_valid
+        return is_valid_vat(vat) or is_valid_stnr(vat)
+
+    def check_vat_il(self, vat):
+        check_func = stdnum.util.get_cc_module('il', 'idnr').is_valid
+        return check_func(vat)
 
     def format_vat_sm(self, vat):
         stdnum_vat_format = stdnum.util.get_cc_module('sm', 'vat').compact

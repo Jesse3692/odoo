@@ -19,7 +19,7 @@ class PosConfig(models.Model):
         return self.env['stock.warehouse'].search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).id
 
     def _default_picking_type_id(self):
-        return self.env['stock.warehouse'].search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).pos_type_id.id
+        return self.env['stock.warehouse'].with_context(active_test=False).search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).pos_type_id.id
 
     def _default_sale_journal(self):
         return self.env['account.journal'].search([
@@ -303,7 +303,7 @@ class PosConfig(models.Model):
                 if pm.journal_id and pm.journal_id.currency_id and pm.journal_id.currency_id != config.currency_id:
                     raise ValidationError(_("All payment methods must be in the same currency as the Sales Journal or the company currency if that is not set."))
 
-            if config.use_pricelist and config.pricelist_id and any(config.available_pricelist_ids.mapped(lambda pricelist: pricelist.currency_id != config.currency_id)):
+            if config.use_pricelist and any(config.available_pricelist_ids.mapped(lambda pricelist: pricelist.currency_id != config.currency_id)):
                 raise ValidationError(_("All available pricelists must be in the same currency as the company or"
                                         " as the Sales Journal set on this point of sale if you use"
                                         " the Accounting application."))

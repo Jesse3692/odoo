@@ -651,6 +651,9 @@ class Task(models.Model):
                         extract_data(task)
                 task.name = task.display_name.strip()
 
+    def _portal_get_parent_hash_token(self, pid):
+        return self.project_id._sign_token(pid)
+
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         if default is None:
@@ -665,6 +668,7 @@ class Task(models.Model):
         default['child_ids'] = [child.copy({'name': child.name}).id for child in self.child_ids]
         self_with_mail_context = self.with_context(mail_auto_subscribe_no_notify=True, mail_create_nosubscribe=True)
         task_copy = super(Task, self_with_mail_context).copy(default)
+        original_task_state = self.state
         if self.allow_task_dependencies:
             task_mapping = self.env.context.get('task_mapping')
             task_mapping[self.id] = task_copy.id
@@ -673,6 +677,8 @@ class Task(models.Model):
             self.write({'dependent_ids': [Command.unlink(t.id) for t in self.dependent_ids if t.id in new_tasks]})
             task_copy.write({'depend_on_ids': [Command.link(task_mapping.get(t.id, t.id)) for t in self.depend_on_ids]})
             task_copy.write({'dependent_ids': [Command.link(task_mapping.get(t.id, t.id)) for t in self.dependent_ids]})
+        if self.state != original_task_state:
+            self.write({'state': original_task_state})
         if self.allow_milestones:
             milestone_mapping = self.env.context.get('milestone_mapping', {})
             task_copy.milestone_id = milestone_mapping.get(task_copy.milestone_id.id, task_copy.milestone_id.id)
@@ -767,6 +773,8 @@ class Task(models.Model):
             project = self.env['project.project'].browse(project_id)
             if project.analytic_account_id:
                 vals['analytic_account_id'] = project.analytic_account_id.id
+            if 'company_id' in default_fields and 'default_project_id' not in self.env.context:
+                vals['company_id'] = project.sudo().company_id
         elif 'default_user_ids' not in self.env.context and 'user_ids' in default_fields:
             user_ids = vals.get('user_ids', [])
             user_ids.append(Command.link(self.env.user.id))
@@ -925,6 +933,7 @@ class Task(models.Model):
                     'display_in_project': False,
                 })
 
+            project_id = project_id or self.env.context.get('default_project_id')
             if project_id and not "company_id" in vals:
                 vals["company_id"] = self.env["project.project"].browse(
                     project_id

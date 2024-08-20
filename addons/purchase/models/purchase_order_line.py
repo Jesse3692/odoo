@@ -124,7 +124,7 @@ class PurchaseOrderLine(models.Model):
             line = line.with_company(line.company_id)
             fpos = line.order_id.fiscal_position_id or line.order_id.fiscal_position_id._get_fiscal_position(line.order_id.partner_id)
             # filter taxes by company
-            taxes = line.product_id.supplier_taxes_id.filtered_domain(self.env['account.tax']._check_company_domain(line.company_id))
+            taxes = line.product_id.supplier_taxes_id._filter_taxes_by_company(line.company_id)
             line.taxes_id = fpos.map_tax(taxes)
 
     @api.depends('discount', 'price_unit')
@@ -319,7 +319,7 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             if not line.product_id or line.invoice_lines or not line.company_id:
                 continue
-            params = {'order_id': line.order_id}
+            params = line._get_select_sellers_params()
             seller = line.product_id._select_seller(
                 partner_id=line.partner_id,
                 quantity=line.product_qty,
@@ -438,7 +438,7 @@ class PurchaseOrderLine(models.Model):
         if self.taxes_id:
             qty = self.product_qty or 1
             price_unit_prec = self.env['decimal.precision'].precision_get('Product Price')
-            price_unit = self.taxes_id.with_context(round=False).compute_all(price_unit, currency=self.order_id.currency_id, quantity=qty)['total_void']
+            price_unit = self.taxes_id.with_context(round=False).compute_all(price_unit, currency=self.order_id.currency_id, quantity=qty, product=self.product_id)['total_void']
             price_unit = float_round(price_unit / qty, precision_digits=price_unit_prec)
         if self.product_uom.id != self.product_id.uom_id.id:
             price_unit *= self.product_uom.factor / self.product_id.uom_id.factor
@@ -593,7 +593,7 @@ class PurchaseOrderLine(models.Model):
             date=po.date_order and max(po.date_order.date(), today) or today,
             uom_id=product_id.uom_po_id)
 
-        product_taxes = product_id.supplier_taxes_id.filtered(lambda x: x.company_id.id == company_id.id)
+        product_taxes = product_id.supplier_taxes_id.filtered(lambda x: x.company_id in company_id.parent_ids)
         taxes = po.fiscal_position_id.map_tax(product_taxes)
 
         price_unit = seller.price if seller else product_id.standard_price
@@ -657,3 +657,9 @@ class PurchaseOrderLine(models.Model):
                 business_domain='purchase_order',
                 company_id=line.company_id.id,
             )
+
+    def _get_select_sellers_params(self):
+        self.ensure_one()
+        return {
+            "order_id": self.order_id,
+        }

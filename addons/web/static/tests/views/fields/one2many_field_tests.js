@@ -2678,6 +2678,31 @@ QUnit.module("Fields", (hooks) => {
         ]);
     });
 
+    QUnit.test("one2many list order with handle widget", async (assert) => {
+        await makeView({
+            type: "form",
+            resModel: "partner",
+            serverData,
+            arch: `
+                <form>
+                    <field name="p">
+                        <tree editable="top">
+                            <field name="int_field" widget="handle"/>
+                            <field name="foo"/>
+                        </tree>
+                    </field>
+                </form>`,
+            resId: 1,
+            mockRPC(route, args) {
+                if (args.method === "web_read") {
+                    assert.step(`web_read`);
+                    assert.strictEqual(args.kwargs.specification.p.order, "int_field ASC, id ASC");
+                }
+            },
+        });
+        assert.verifySteps(["web_read"]);
+    });
+
     QUnit.test("one2many field when using the pager", async function (assert) {
         const ids = [];
         for (let i = 0; i < 45; i++) {
@@ -5667,6 +5692,56 @@ QUnit.module("Fields", (hooks) => {
 
         // save the record
         await clickSave(target);
+    });
+
+    QUnit.test("one2many, edit record in dialog, save, re-edit, discard", async function (assert) {
+        assert.expect(6);
+        serverData.models.partner.records[0].p = [2];
+
+        await makeView({
+            type: "form",
+            resModel: "partner",
+            serverData,
+            arch: `
+                <form>
+                    <field name="p">
+                        <form>
+                            <field name="int_field"/>
+                        </form>
+                        <tree>
+                            <field name="int_field"/>
+                        </tree>
+                    </field>
+                </form>`,
+            resId: 1,
+        });
+
+        assert.strictEqual(target.querySelector(".o_data_cell[name=int_field]").innerText, "9");
+
+        await click(target.querySelector(".o_data_row .o_data_cell"));
+        assert.strictEqual(
+            target.querySelector(".modal .o_field_widget[name=int_field] input").value,
+            "9"
+        );
+
+        await editInput(target, ".modal .o_field_widget[name=int_field] input", "123");
+        await clickSave(target.querySelector(".modal"));
+        assert.strictEqual(target.querySelector(".o_data_cell[name=int_field]").innerText, "123");
+
+        await click(target.querySelector(".o_data_row .o_data_cell"));
+        assert.strictEqual(
+            target.querySelector(".modal .o_field_widget[name=int_field] input").value,
+            "123"
+        );
+
+        await clickDiscard(target.querySelector(".modal"));
+        assert.strictEqual(target.querySelector(".o_data_cell[name=int_field]").innerText, "123");
+
+        await click(target.querySelector(".o_data_row .o_data_cell"));
+        assert.strictEqual(
+            target.querySelector(".modal .o_field_widget[name=int_field] input").value,
+            "123"
+        );
     });
 
     QUnit.test(
@@ -13459,6 +13534,61 @@ QUnit.module("Fields", (hooks) => {
         assert.verifySteps(["onchange partner", "web_save turtle"]);
     });
 
+    QUnit.test(
+        "Boolean toggle in x2many must not be editable if form is not editable",
+        async function (assert) {
+            serverData.views = {
+                "turtle,false,form": `<form>
+                        <field name="turtle_bar" widget="boolean_toggle"/>
+                        <field name="partner_ids">
+                            <tree>
+                                <field name="bar" widget="boolean_toggle"/>
+                            </tree>
+                        </field>
+                    </form>`,
+            };
+
+            await makeView({
+                type: "form",
+                resModel: "partner",
+                serverData,
+                arch: `
+                    <form edit="0">
+                        <field name="turtles">
+                            <tree>
+                                <field name="turtle_bar" widget="boolean_toggle"/>
+                            </tree>
+                        </field>
+                    </form>`,
+                resId: 1,
+            });
+
+            assert.hasClass(target.querySelector(".o_form_renderer"), "o_form_readonly");
+            const booleanToggle = target.querySelector(
+                "[name='turtles'] .o_data_row [name='turtle_bar'] .o_boolean_toggle input"
+            );
+            assert.ok(
+                booleanToggle.disabled,
+                "The boolean toggle should be disabled when the form is readonly"
+            );
+
+            await click(target, ".o_data_cell");
+            assert.containsOnce(target, ".modal-dialog");
+            assert.hasClass(target.querySelector(".o_form_renderer"), "o_form_readonly");
+            const booleanToggleInDialog = target.querySelector(".modal [name='turtle_bar'] input");
+            assert.ok(
+                booleanToggleInDialog.disabled,
+                "The boolean toggle in the form view dialog should be disabled when the main form is readonly"
+            );
+            assert.ok(
+                target.querySelector(
+                    ".modal [name='partner_ids'] .o_data_row [name='bar'] .o_boolean_toggle input"
+                ).disabled,
+                "The boolean toggle in x2m in the form view dialog should be disabled when the main form is readonly"
+            );
+        }
+    );
+
     QUnit.test("create a new record with an x2m invisible", async function (assert) {
         await makeView({
             type: "form",
@@ -13960,6 +14090,41 @@ QUnit.module("Fields", (hooks) => {
         await nextTick();
 
         assert.containsOnce(target, ".modal .o_data_row td[name=display_name]");
+    });
+
+    QUnit.test("one2many, form view dialog with custom footer", async function (assert) {
+        serverData.models.partner.records[0].p = [1];
+
+        await makeView({
+            type: "form",
+            resModel: "partner",
+            serverData,
+            arch: `
+                <form>
+                    <field name="p">
+                        <tree>
+                            <field name="display_name"/>
+                        </tree>
+                        <form>
+                            <field name="display_name"/>
+                            <footer>
+                                <span class="my_span">Hello</span>
+                            </footer>
+                        </form>
+                    </field>
+                </form>`,
+            resId: 1,
+        });
+
+        await click(target.querySelector(".o_data_row td[name=display_name]"));
+        assert.containsOnce(target, ".modal-footer .my_span");
+
+        await click(target.querySelector(".modal-header .btn-close"));
+        assert.containsNone(target, ".modal");
+
+        // open it again
+        await click(target.querySelector(".o_data_row td[name=display_name]"));
+        assert.containsOnce(target, ".modal-footer .my_span");
     });
 
     QUnit.test('Add a line, click on "Save & New" with an invalid form', async function (assert) {

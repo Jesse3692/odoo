@@ -18,7 +18,7 @@ class AccountEdiXmlCII(models.AbstractModel):
     _description = "Factur-x/XRechnung CII 2.2.0"
 
     def _export_invoice_filename(self, invoice):
-        return "factur-x.xml"
+        return f"{invoice.name.replace('/', '_')}_factur_x.xml"
 
     def _export_invoice_ecosio_schematrons(self):
         return {
@@ -293,7 +293,7 @@ class AccountEdiXmlCII(models.AbstractModel):
 
         # ==== Invoice origin ====
 
-        invoice_origin_node = tree.find('./{*}OrderReference/{*}ID')
+        invoice_origin_node = tree.find('.//{*}BuyerOrderReferencedDocument/{*}IssuerAssignedID')
         if invoice_origin_node is not None:
             invoice.invoice_origin = invoice_origin_node.text
 

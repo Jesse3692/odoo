@@ -168,6 +168,7 @@ class Partner(models.Model):
     _order = "complete_name ASC, id DESC"
     _rec_names_search = ['complete_name', 'email', 'ref', 'vat', 'company_registry']  # TODO vat must be sanitized the same way for storing/searching
     _allow_sudo_commands = False
+    _check_company_domain = models.check_company_domain_parent_of
 
     # the partner types that must be added to a partner's complete name, like "Delivery"
     _complete_name_displayed_types = ('invoice', 'delivery', 'other')
@@ -845,7 +846,7 @@ class Partner(models.Model):
     @api.depends_context('show_address', 'partner_show_db_id', 'address_inline', 'show_email', 'show_vat', 'lang')
     def _compute_display_name(self):
         for partner in self:
-            name = partner.with_context({'lang': self.env.lang})._get_complete_name()
+            name = partner.with_context(lang=self.env.lang)._get_complete_name()
             if partner._context.get('show_address'):
                 name = name + "\n" + partner._display_address(without_company=True)
             name = re.sub(r'\s+\n', '\n', name)
@@ -1057,6 +1058,15 @@ class Partner(models.Model):
     def _get_country_name(self):
         return self.country_id.name or ''
 
+    def _get_all_addr(self):
+        self.ensure_one()
+        return [{
+            'contact_type': self.street,
+            'street': self.street,
+            'zip': self.zip,
+            'city': self.city,
+            'country': self.country_id.code,
+        }]
 
 
 class ResPartnerIndustry(models.Model):

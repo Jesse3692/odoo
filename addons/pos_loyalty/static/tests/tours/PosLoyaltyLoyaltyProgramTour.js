@@ -163,7 +163,7 @@ registry.category("web_tour.tours").add("PosLoyaltyLoyaltyProgram3", {
             // The reward button should be highlighted.
             PosLoyalty.isRewardButtonHighlighted(true),
             PosLoyalty.claimReward("Free Product - Whiteboard Pen"),
-            PosLoyalty.hasRewardLine("Free Product - Whiteboard Pen", "0.0", "1.00"),
+            PosLoyalty.hasRewardLine("Free Product - Whiteboard Pen", "0.0", "2.00"),
 
             PosLoyalty.orderTotalIs("10.2"),
             PosLoyalty.finalizeOrder("Cash", "10.2"),
@@ -183,4 +183,26 @@ registry.category("web_tour.tours").add("PosLoyaltyPromotion", {
             ProductScreen.addOrderline("Test Product 1", "1.00", "100"),
             ProductScreen.totalAmountIs("80.00"),
         ].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyDontGrantPointsForRewardOrderLines", {
+    test: true,
+    url: "/pos/web",
+    steps: () =>
+        [
+          ProductScreen.confirmOpeningPopup(),
+          ProductScreen.clickHomeCategory(),
+
+          ProductScreen.clickPartnerButton(),
+          ProductScreen.clickCustomer('Test Partner'),
+
+          ProductScreen.addOrderline('Desk Organizer', '1'),
+          ProductScreen.addOrderline('Whiteboard Pen', '1'),
+
+          PosLoyalty.isRewardButtonHighlighted(true),
+          PosLoyalty.claimReward("100% on the cheapest product"),
+
+          PosLoyalty.orderTotalIs('5.10'),
+          PosLoyalty.finalizeOrder('Cash', '5.10'),
+        ].flat()
 });

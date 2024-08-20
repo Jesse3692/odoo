@@ -5,14 +5,15 @@
 # Translators:
 # Wil Odoo, 2023
 # Jolien De Paepe, 2024
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2024
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-26 21:55+0000\n"
+"POT-Creation-Date: 2024-08-13 10:28+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Jolien De Paepe, 2024\n"
+"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2024\n"
 "Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,6 +85,17 @@ msgid "Inside quote"
 msgstr "Binnen offerte"
 
 #. module: sale_pdf_quote_builder
+#. odoo-python
+#: code:addons/sale_pdf_quote_builder/utils.py:0
+#, python-format
+msgid ""
+"It seems that we're not able to process this pdf inside a quotation. It is "
+"either encrypted, or encoded in a format we do not support."
+msgstr ""
+"Het lijkt erop dat we deze pdf niet in een offerte kunnen verwerken. Het is "
+"gecodeerd of gecodeerd in een formaat dat we niet ondersteunen."
+
+#. module: sale_pdf_quote_builder
 #: model_terms:ir.ui.view,arch_db:sale_pdf_quote_builder.sale_order_template_form
 msgid "Learn more from the documentation."
 msgstr "Vind meer informatie in de documentatie."
@@ -129,7 +141,7 @@ msgid ""
 "                            will be added after header pages and before the quotation details."
 msgstr ""
 "Productbeschrijvingen zijn PDF-documenten die je rechtstreeks op producten kan toevoegen. \n"
-"Ga hiervoor naar een product, vind de knop \"productdocumenten\" en voeg een\n"
+"Ga hiervoor naar een product, vind de knop \"Documenten\" en voeg een\n"
 "nieuw PDF-document toe met de zichtbaarheid ingesteld op \"Binnen offertes\". Voor elk product\n"
 "in de offerte, als het product een \"binnen offerte\" document heeft, wordt dit document\n"
 "toegevoegd na de voorbladen en voor de offertedetails."
@@ -198,3 +210,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_pdf_quote_builder.field_product_document__attached_on
 msgid "Visible at"
 msgstr "Zichtbaar op"
+
+#. module: sale_pdf_quote_builder
+#. odoo-python
+#: code:addons/sale_pdf_quote_builder/models/product_document.py:0
+#, python-format
+msgid "When attached inside a quote, the document must be a file, not a URL."
+msgstr ""
+"Als het document in een offerte is bijgevoegd, moet het een bestand zijn en "
+"geen URL."

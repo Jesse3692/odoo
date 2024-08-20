@@ -53,9 +53,11 @@ export class Messaging {
      * Import data received from init_messaging
      */
     async initialize() {
-        await this.rpc("/mail/init_messaging", {}, { silent: true }).then(
-            this.initMessagingCallback.bind(this)
-        );
+        await this.rpc(
+            "/mail/init_messaging",
+            { context: this.env.services.user.context },
+            { silent: true }
+        ).then(this.initMessagingCallback.bind(this));
     }
 
     initMessagingCallback(data) {
@@ -122,7 +124,11 @@ export class Messaging {
             const partner = persona;
             // todo: need to filter out non-user partners (there was a user key)
             // also, filter out inactive partners
-            if (partner.name && cleanTerm(partner.name).includes(searchTerm)) {
+            if (
+                partner.name &&
+                cleanTerm(partner.name).includes(searchTerm) &&
+                ((partner.active && partner.user) || partner === this.store.odoobot)
+            ) {
                 partners.push(partner);
                 if (partners.length >= limit) {
                     break;

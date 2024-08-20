@@ -6,14 +6,15 @@
 # Jolien De Paepe, 2024
 # Wil Odoo, 2024
 # Sarah Bellefroid, 2024
+# Manon Rondou, 2024
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-29 10:45+0000\n"
+"POT-Creation-Date: 2024-08-13 10:28+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Sarah Bellefroid, 2024\n"
+"Last-Translator: Manon Rondou, 2024\n"
 "Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -643,7 +644,7 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        <t t-set=\"doc_name\" t-value=\"'devis' if object.state in ('draft', 'sent') else 'ordre'\"></t>\n"
+"        <t t-set=\"doc_name\" t-value=\"'devis' if object.state in ('draft', 'sent') else 'commande'\"></t>\n"
 "        Bonjour,\n"
 "        <br><br>\n"
 "        Votre\n"
@@ -737,6 +738,11 @@ msgstr "<i class=\"fa fa-fw fa-check\"/> Autorisé"
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
 msgid "<i class=\"fa fa-fw fa-check\"/> Paid"
 msgstr "<i class=\"fa fa-fw fa-check\"/> Payé"
+
+#. module: sale
+#: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
+msgid "<i class=\"fa fa-fw fa-check\"/> Reversed"
+msgstr "<i class=\"fa fa-fw fa-check\"/> Inversé"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.portal_my_quotations
@@ -4144,14 +4150,14 @@ msgid "Sales Analysis"
 msgstr "Analyse des ventes"
 
 #. module: sale
-#: model:ir.actions.act_window,name:sale.action_order_report_customers
-msgid "Sales Analysis By Customers"
-msgstr "Analyse des ventes par clients"
-
-#. module: sale
 #: model:ir.actions.act_window,name:sale.action_order_report_salesperson
 msgid "Sales Analysis By Salespersons"
 msgstr "Analyse des ventes par vendeurs"
+
+#. module: sale
+#: model:ir.actions.act_window,name:sale.action_order_report_customers
+msgid "Sales Analysis Per Customers"
+msgstr "Analyse des ventes par clients"
 
 #. module: sale
 #: model:ir.actions.act_window,name:sale.action_order_report_products
@@ -4978,7 +4984,6 @@ msgstr ""
 
 #. module: sale
 #. odoo-python
-#. odoo-python
 #: code:addons/sale/models/product_template.py:0
 #, python-format
 msgid "The product (%s) has incompatible values: %s"
@@ -5023,11 +5028,6 @@ msgstr "Les paramètres fournis ne sont pas valides."
 #, python-format
 msgid "The value of the down payment amount must be positive."
 msgstr "La valeur du montant de l'acompte doit être positive."
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.portal_my_orders
-msgid "There are currently no orders for your account."
-msgstr "Il n'y a actuellement pas de commandes pour votre compte."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.portal_my_quotations
@@ -5481,6 +5481,7 @@ msgstr "Avertissement"
 
 #. module: sale
 #. odoo-python
+#: code:addons/sale/models/product_template.py:0
 #: code:addons/sale/models/sale_order.py:0
 #: code:addons/sale/models/sale_order_line.py:0
 #, python-format
@@ -5568,6 +5569,14 @@ msgid "You cannot cancel a locked order. Please unlock it first."
 msgstr ""
 "Vous ne pouvez pas annuler une commande verrouillée. Veuillez d'abord la "
 "déverrouiller."
+
+#. module: sale
+#. odoo-python
+#: code:addons/sale/models/sale_order.py:0
+#, python-format
+msgid "You cannot change the pricelist of a confirmed order !"
+msgstr ""
+"Vous ne pouvez pas changer la liste de prix sur une commande validée !"
 
 #. module: sale
 #. odoo-python
